@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitPulse Web Trigger</title>
+</head>
+<body>
+  <h1>GitPulse Logger</h1>
+  <label for="mode">Mode:</label>
+  <select id="mode">
+    <option value="text">Text</option>
+    <option value="file">File</option>
+    <option value="both">Both</option>
+  </select>
+  <button onclick="trigger()">Trigger Logger</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    async function trigger() {
+      const mode = document.getElementById('mode').value;
+      const output = document.getElementById('output');
+      output.textContent = '⏳ Mengirim permintaan...';
+
+      try {
+        const response = await fetch('/trigger-logger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode })
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          output.textContent = '✅ Log berhasil dikirim ke Telegram!\nMode: ' + result.sent_mode;
+        } else {
+          output.textContent = '❌ Error: ' + result.message;
+        }
+      } catch (err) {
+        output.textContent = '❌ Gagal menghubungi server: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
